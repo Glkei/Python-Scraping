@@ -1,9 +1,18 @@
 import datetime
 import urllib.request
+import urllib.error
 import csv
 import time
 import os
 from bs4 import BeautifulSoup
+
+def download_img(url, dst_path):
+    try:
+        data = urllib.request.urlopen(url).read()
+        with open(dst_path, mode="wb") as f:
+            f.write(data)
+    except urllib.error.URLError as e:
+        print(e)
 
 #url接続
 url = input("Type Here The Site Domain----->")
@@ -29,8 +38,8 @@ if html :
     #----------------------------------------------#
 
     #指定したタグの情報取得
-    deta = BeautifulSoup(html,"html.parser")
-    tag_detas = deta.find_all(target_tag,attrs={'class':target_class})
+    html_deta = BeautifulSoup(html,"html.parser")
+    tag_detas = html_deta.find_all(target_tag,attrs={'class':target_class})
     tag_deta_length = len(tag_detas)
 
     #csv名にユニークにする
@@ -57,17 +66,18 @@ if html :
             Dir_name = input('type your image directory`s name----->')
             print("\n.......OK done...\n")
             os.mkdir('img/'+ Dir_name)
+            img_save_Dir = f'img/{Dir_name}/'
 
             #画像保存するタグを入力させる。
             img_class = input('type your img class. but you can type nothing------->')
-            img_detas = deta.find_all('img',attrs={'class':img_class})
+            img_tags = html_deta.find_all('img',attrs={'class':img_class})
 
-            if img_detas :
+            if img_tags :
 
                 print('\nthe your selected image was successful......\n')
 
                 #イメージのダウンロードリンク格納用のリスト変数
-                img_deta = []
+                img_urls = []
 
                 #ダウンロードクールダウン 1sec
                 sleep_time = 1
@@ -75,26 +85,18 @@ if html :
                 #For文の繰り返し回数を数える i++
                 i = 0;
 
-                #画像の繰り返し保存を実行する　&&　サーバーへの負担を軽減するためにクールダウンを設定
-                for img_deta in img_detas:
+                #ソースを抽出
+                for img in img_tags:
+                    img_urls.append(img.get('src'))
 
-                    #ソースを抽出
-                    img_src = img_detas.append(img_deta.get('src'))
-                    fileName = os.path.basename(img_src)
+                #imgタグの数だけ抽出ほぞん
+                for img_url in img_urls:
 
-                    #クールダウン
+                    filename = os.path.basename(img_url)
+                    dst_path = os.path.join(img_save_Dir, filename)
                     time.sleep(sleep_time)
-
-                    #ファイル名と拡張子の抽出
-                    # basename,extension = os.path.splitext(fileName)
-
-                    #ファイル保存用名変数を作成
-                    # img_fileName = str(i) + '.' + extension
-
-                    #画像をダウンロード
-                    download_img(url,fileName)
-
-                    i += 1
+                    print(f'DL:---->{img_url}')
+                    download_img(url,dst_path)
 
         case "n":
 
