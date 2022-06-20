@@ -58,7 +58,7 @@ if html :
     match YorN:
         case "Y":
             #ディレクトリ作成させ、そこに動画を保存させる。
-            Dir_name = input('type your image directory`s name----->')
+            Dir_name = input('\ntype your image directory`s name----->')
             print("\n.......OK done...\n")
             img_save_Dir = f'img/{Dir_name}/'
             os.mkdir(img_save_Dir)
@@ -74,6 +74,8 @@ if html :
                 #ダウンロードクールダウン 1sec
                 sleep_time = 1
 
+                count = 0
+
                 #ソースを抽出
                 for img in img_tags:
 
@@ -82,7 +84,12 @@ if html :
                     with open(str(img_save_Dir) + str(uuid.uuid4()) + str('.jpeg'),'wb') as file:
                         file.write(r.content)
                         time.sleep(sleep_time)
-                        print(f'DL:---->{img["src"]}')
+                        print(f'DL:---->{img["src"]}\n')
+
+
+                    count += 1
+
+            print(f'{ count } picture has saved.......bye!!')
 
         case "n":
 
