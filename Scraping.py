@@ -1,18 +1,13 @@
+import function
 import datetime
 import urllib.request
 import urllib.error
 import csv
 import time
 import os
+import uuid
+import requests
 from bs4 import BeautifulSoup
-
-def download_img(url, dst_path):
-    try:
-        data = urllib.request.urlopen(url).read()
-        with open(dst_path, mode="wb") as f:
-            f.write(data)
-    except urllib.error.URLError as e:
-        print(e)
 
 #url接続
 url = input("Type Here The Site Domain----->")
@@ -65,8 +60,8 @@ if html :
             #ディレクトリ作成させ、そこに動画を保存させる。
             Dir_name = input('type your image directory`s name----->')
             print("\n.......OK done...\n")
-            os.mkdir('img/'+ Dir_name)
             img_save_Dir = f'img/{Dir_name}/'
+            os.mkdir(img_save_Dir)
 
             #画像保存するタグを入力させる。
             img_class = input('type your img class. but you can type nothing------->')
@@ -76,31 +71,22 @@ if html :
 
                 print('\nthe your selected image was successful......\n')
 
-                #イメージのダウンロードリンク格納用のリスト変数
-                img_urls = []
-
                 #ダウンロードクールダウン 1sec
                 sleep_time = 1
 
-                #For文の繰り返し回数を数える i++
-                i = 0;
-
                 #ソースを抽出
                 for img in img_tags:
-                    img_urls.append(img.get('src'))
 
-                #imgタグの数だけ抽出ほぞん
-                for img_url in img_urls:
+                    r = requests.get(img['src'])
 
-                    filename = os.path.basename(img_url)
-                    dst_path = os.path.join(img_save_Dir, filename)
-                    time.sleep(sleep_time)
-                    print(f'DL:---->{img_url}')
-                    download_img(url,dst_path)
+                    with open(str(img_save_Dir) + str(uuid.uuid4()) + str('.jpeg'),'wb') as file:
+                        file.write(r.content)
+                        time.sleep(sleep_time)
+                        print(f'DL:---->{img["src"]}')
 
         case "n":
 
-            print('....OK all is already done..... and csv already saved....check it!!')
+            print('......bye')
 
 else :
     print("can not connet at this...")
