@@ -1,4 +1,3 @@
-import function
 import datetime
 import urllib.request
 import urllib.error
@@ -7,7 +6,20 @@ import time
 import os
 import uuid
 import requests
+import random
 from bs4 import BeautifulSoup
+from selenium import webdriver
+
+#User_agentの偽造
+opener = urllib.request.build_opener()
+user_agent = ['Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15',
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36'
+              ]
+
+UA = user_agent[random.randrange(0,len(user_agent),1)]
+opener.addheaders = [('User-Agent', UA)]
+urllib.request.install_opener(opener)
 
 #url接続
 url = input("Type Here The Site Domain----->")
@@ -44,18 +56,19 @@ if html :
 
     #csvを新規作成＆書き込み
     with open('csv/' + date_name ,'w',encoding="utf_8") as csv_file:
-        fieldnames = ['id','comment']
+        fieldnames = ['comment']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
 
         for i in range(tag_deta_length):
             TAG = tag_detas[i].getText()
             print(str(i) +' | '+ TAG + '\n')
-            writer.writerow({'id':i,'comment':TAG})
+            writer.writerow({'comment':TAG})
 
     YorN = input('do you want to save image too? (Y/n)----->')
 
     match YorN:
+
         case "Y":
             #ディレクトリ作成させ、そこに動画を保存させる。
             Dir_name = input('\ntype your image directory`s name----->')
@@ -84,7 +97,7 @@ if html :
                     with open(str(img_save_Dir) + str(uuid.uuid4()) + str('.jpeg'),'wb') as file:
                         file.write(r.content)
                         time.sleep(sleep_time)
-                        print(f'DL:---->{img["src"]}\n')
+                        print(f'DL:---->{img["src"]}')
 
 
                     count += 1
@@ -92,7 +105,6 @@ if html :
             print(f'{ count } picture has saved.......bye!!')
 
         case "n":
-
             print('......bye')
 
 else :
